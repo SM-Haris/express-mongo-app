@@ -1,0 +1,55 @@
+import { UserConstants } from "../../lib/constants";
+import { User } from "../../lib/models/user";
+import { LoginRequestBody, SignUpRequestBody } from "../../lib/types/auth";
+import { getAuthTokens, validatePassword } from "../../lib/utils/auth";
+import bcrypt from "bcrypt";
+
+class AuthManager {
+  static async signup(data: SignUpRequestBody) {
+    try {
+      const { email, username, password } = data;
+
+      const existingUser = await User.findOne({
+        $or: [{ email }, { username }],
+      });
+      
+      if (existingUser) {
+        throw new Error("User with this username/email already exists");
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({
+        email,
+        username,
+        password: hashedPassword,
+      });
+
+      await newUser.save();
+
+      return "User created successfuly";
+    } catch (error) {
+      throw new Error(UserConstants.MESSAGES.SIGN_UP_FAILED);
+    }
+  }
+
+  static async login(data: LoginRequestBody) {
+    try {
+      const { email, password } = data;
+
+      const user = await User.findOne({ email });
+      if (!user) {
+        throw new Error("No active user with these credentials exists");
+      }
+
+      await validatePassword(password, user.password);
+
+      const authTokens = await getAuthTokens(user.id);
+
+      return authTokens;
+    } catch (error) {
+      throw new Error(UserConstants.MESSAGES.LOGIN_FAILED);
+    }
+  }
+}
+
+export default AuthManager;
