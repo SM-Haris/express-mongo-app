@@ -1,11 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import Joi from 'joi';
 
-interface ValidationResult {
-  error: Joi.ValidationError | null;
-  value: any;
-}
-
 function validateRequest(schema: Joi.Schema) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const { error, value } = schema.validate(req.body);

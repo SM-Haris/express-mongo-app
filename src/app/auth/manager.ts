@@ -14,7 +14,7 @@ class AuthManager {
       });
       
       if (existingUser) {
-        throw new Error("User with this username/email already exists");
+        throw new Error(UserConstants.MESSAGES.USER_ALREADY_REGISTERED);
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -26,7 +26,7 @@ class AuthManager {
 
       await newUser.save();
 
-      return "User created successfuly";
+      return UserConstants.MESSAGES.SIGN_UP_SUCCESS;
     } catch (error) {
       throw new Error(UserConstants.MESSAGES.SIGN_UP_FAILED);
     }
@@ -38,7 +38,7 @@ class AuthManager {
 
       const user = await User.findOne({ email });
       if (!user) {
-        throw new Error("No active user with these credentials exists");
+        throw new Error(UserConstants.MESSAGES.USER_VALIDATION_FAILURE);
       }
 
       await validatePassword(password, user.password);

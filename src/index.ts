@@ -1,15 +1,9 @@
-import express, {
-  Express,
-  NextFunction,
-  Response,
-  Request,
-  ErrorRequestHandler,
-} from "express";
+import express, { Express, ErrorRequestHandler } from "express";
 import cors from "cors";
-import logger from "morgan";
 import dotenv from "dotenv";
 import { DatabaseConnection } from "./lib/helpers/Database";
 import router from "./routes";
+import logger from "./lib/helpers/Logger";
 
 dotenv.config();
 
@@ -21,28 +15,33 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use((req, res, next) => {
+  logger.info(
+    `METHOD:${req?.method}  URL:${req?.url}  HOSTNAME:${req?.hostname}  IP:${req.ip}`
+  );
+  next();
+});
+
 app.use(router);
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  logger.error(
+    `ERROR:${err.message} METHOD:${req?.method}  URL:${req?.url}  HOSTNAME:${req?.hostname}  IP:${req.ip}`
+  );
   if (err.name === "UnauthorizedError") {
     res.status(403).send({ ...err, status: 403 });
   } else {
-    next(err);
+    res.status(err.status || 500).send({
+      status: err.status,
+      message: err.message,
+    });
   }
 };
 
 app.use(errorHandler);
-
-app.use(function (err: any, req: Request, res: Response, _next: NextFunction) {
-  res.status(err.status || 500);
-  res.send({
-    status: err.status,
-    message: err.message,
-  });
-});
 
 app.listen(port, () => {
   console.log(`[INFO] Server is listening at http://localhost:${port}`);

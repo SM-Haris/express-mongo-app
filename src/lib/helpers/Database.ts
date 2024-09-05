@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
+import { ErrorMessages } from "../constants";
 
 export const DatabaseConnection = async () => {
   try {
-    await mongoose.connect("mongodb://127.0.0.1:27017/test");
+    await mongoose.connect(process.env.DATABASE_URL as string);
   } catch (error) {
-    throw new Error(`[ERROR] Database connection failed`);
+    throw new Error(ErrorMessages.MESSAGES.DATABASE_CONNECTION_ERROR);
   }
 };
