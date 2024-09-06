@@ -12,6 +12,7 @@ This repository provides a well-structured Express Mongoose REST backend app sta
 * **JWT Token-Based Authentication:** Employs JWT tokens for secure session management and user verification.
 * **File-Based Logging with Rotation:** Implements file-based logging with daily rotation for easy monitoring and analysis.
 * **Bcrypt Hashing:** Uses Bcrypt for secure password hashing, protecting user credentials.
+* **Advanced Security Policy:** Uses Helmet to ensure secure HTTP policy in security headers.
 
 ## Getting Started
 

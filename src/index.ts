@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { DatabaseConnection } from "./lib/helpers/Database";
 import router from "./routes";
 import logger from "./lib/helpers/Logger";
+import helmet from "helmet";
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -45,6 +47,10 @@ app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`[INFO] Server is listening at http://localhost:${port}`);
+});
+
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Hello World" });
 });
 
 const startServer = async () => {
