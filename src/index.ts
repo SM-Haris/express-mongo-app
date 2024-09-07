@@ -2,9 +2,10 @@ import express, { Express, ErrorRequestHandler } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import { DatabaseConnection } from "./lib/helpers/Database";
-import router from "./routes";
+import router from "./router";
 import logger from "./lib/helpers/Logger";
 import helmet from "helmet";
+import { ErrorCodes } from "./lib/constants";
 
 dotenv.config();
 
@@ -20,6 +21,28 @@ app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  logger.error(
+    `ERROR:${err.message} METHOD:${req?.method}  URL:${req?.url}  HOSTNAME:${req?.hostname}  IP:${req.ip}`
+  );
+  
+  if (err?.isOperational && err?.errorMessage) {
+    return res
+    .status(err?.statusCode || ErrorCodes.INTERNAL_SERVER_ERROR)
+    .send({ error: err.errorMessage });
+  }
+  
+  if (err.name === "UnauthorizedError") {
+    return res.status(403).send({ ...err, status: 403 });
+  } else {
+    return res.status(err.status || 500).send({
+      status: err.status,
+      message: err.message,
+    });
+  }
+};
+
 app.use((req, res, next) => {
   logger.info(
     `METHOD:${req?.method}  URL:${req?.url}  HOSTNAME:${req?.hostname}  IP:${req.ip}`
@@ -27,22 +50,8 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.use(router);
-
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-  logger.error(
-    `ERROR:${err.message} METHOD:${req?.method}  URL:${req?.url}  HOSTNAME:${req?.hostname}  IP:${req.ip}`
-  );
-  if (err.name === "UnauthorizedError") {
-    res.status(403).send({ ...err, status: 403 });
-  } else {
-    res.status(err.status || 500).send({
-      status: err.status,
-      message: err.message,
-    });
-  }
-};
-
 app.use(errorHandler);
 
 app.listen(port, () => {

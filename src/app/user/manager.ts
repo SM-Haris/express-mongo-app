@@ -1,10 +1,13 @@
 import { ProjectionType } from "mongoose";
-import { UserConstants } from "../../lib/constants";
-import { User } from "../../lib/models/user";
-import { User as UserInterface, UserRequest } from "../../lib/types/auth";
+import { ErrorCodes } from "../../lib/constants";
+import { User } from "./model";
+import { User as UserInterface, UserRequest } from "../auth/types";
+import { NextFunction } from "express";
+import Exception from "../../lib/helpers/Exception";
+import UserConstants from "./constants";
 
 class UserManager {
-  static async getUser(req: UserRequest) {
+  static async getUser(req: UserRequest, next: NextFunction) {
     try {
       const projection: ProjectionType<UserInterface> = {
         _id: 0,
@@ -15,12 +18,18 @@ class UserManager {
       const user = await User.findOne({ id: req.auth.userId }, projection);
 
       if (!user) {
-        throw new Error(UserConstants.MESSAGES.USER_NOT_FOUND);
+        throw new Exception(
+          UserConstants.MESSAGES.USER_NOT_FOUND,
+          ErrorCodes.FORBIDDEN
+        );
       }
 
       return user;
     } catch (error) {
-      throw new Error(UserConstants.MESSAGES.FETCHING_USER_FAILED);
+      throw new Exception(
+        UserConstants.MESSAGES.FETCHING_USER_FAILED,
+        ErrorCodes.FORBIDDEN
+      );
     }
   }
 }

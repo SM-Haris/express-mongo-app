@@ -1,7 +1,7 @@
 import express from "express";
-import AuthController from "../app/auth/controller";
-import validateRequest from "../middlewares/RequestValidators";
-import { loginSchema, userSchema } from "../lib/schemas/auth";
+import AuthController from "./controller";
+import validateRequest from "../../middlewares/RequestValidators";
+import { loginSchema, userSchema } from "./validationSchemas";
 const PREFIX = "/auth";
 const router = express.Router();
 

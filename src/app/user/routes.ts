@@ -1,6 +1,6 @@
 import express from 'express'
-import authenticate from '../middlewares/Authentication'
-import UserController from '../app/user/controller'
+import authenticate from '../../middlewares/Authentication'
+import UserController from './controller'
 
 const PREFIX = '/user'
 const router = express.Router()

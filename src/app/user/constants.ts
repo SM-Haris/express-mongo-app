@@ -1,4 +1,4 @@
-const User = Object.freeze({
+const UserConstants = Object.freeze({
   MESSAGES: {
     USER_ALREADY_REGISTERED: "User with this username/email already exists",
     LOGIN_FAILED: "Something went wrong while login user. Please try again.",
@@ -8,7 +8,8 @@ const User = Object.freeze({
     SIGN_UP_SUCCESS: "User created successfuly",
     USER_NOT_FOUND: "User not found",
     FETCHING_USER_FAILED: "User details could not be fetched",
+    INVALID_PASSWORD: "Invalid password provided for this account"
   },
 });
 
-export default User;
+export default UserConstants;
